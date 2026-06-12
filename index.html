@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT331 Exam Practice</title>
+<style>
+  :root{
+    --bg:#0b0f1a; --card:#131a2b; --card2:#1a2338; --accent:#6c8cff; --accent2:#8b5cf6;
+    --good:#22c55e; --bad:#ef4444; --text:#e7ecf5; --muted:#93a0b8; --border:#26314d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI',system-ui,sans-serif; background:radial-gradient(1200px 600px at 70% -10%, #1b2440 0%, var(--bg) 55%); color:var(--text); min-height:100vh;}
+  .wrap{max-width:880px; margin:0 auto; padding:32px 20px 80px;}
+  header{text-align:center; margin-bottom:32px;}
+  header h1{font-size:1.9rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  header p{color:var(--muted); margin-top:6px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px;}
+  .chap{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; cursor:pointer; transition:.18s; }
+  .chap:hover{transform:translateY(-3px); border-color:var(--accent); box-shadow:0 8px 24px rgba(108,140,255,.15);}
+  .chap h3{font-size:1.02rem; margin-bottom:6px;}
+  .chap span{color:var(--muted); font-size:.85rem;}
+  .hidden{display:none;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; color:var(--muted); font-size:.9rem;}
+  .progress{height:6px; background:var(--card2); border-radius:99px; overflow:hidden; margin-bottom:24px;}
+  .progress div{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); width:0%; transition:.3s;}
+  .qcard{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:26px;}
+  .qtype{display:inline-block; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent); border-radius:99px; padding:3px 10px; margin-bottom:14px;}
+  .qtext{font-size:1.12rem; line-height:1.5; margin-bottom:20px;}
+  .opt{display:block; width:100%; text-align:left; background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:11px; padding:13px 16px; margin-bottom:10px; cursor:pointer; font-size:.98rem; transition:.15s;}
+  .opt:hover:not(:disabled){border-color:var(--accent);}
+  .opt:disabled{cursor:default; opacity:.85;}
+  .opt.correct{border-color:var(--good); background:rgba(34,197,94,.12);}
+  .opt.wrong{border-color:var(--bad); background:rgba(239,68,68,.12);}
+  .feedback{margin-top:14px; padding:13px 15px; border-radius:11px; font-size:.93rem; line-height:1.5;}
+  .feedback.ok{background:rgba(34,197,94,.1); border:1px solid var(--good); color:#a7f3c0;}
+  .feedback.no{background:rgba(239,68,68,.1); border:1px solid var(--bad); color:#fecaca;}
+  .btn{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:11px; padding:12px 26px; font-size:1rem; cursor:pointer; margin-top:18px;}
+  .btn.ghost{background:transparent; border:1px solid var(--border); color:var(--muted);}
+  .result{text-align:center; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:44px 26px;}
+  .score{font-size:3.4rem; font-weight:700; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .result p{color:var(--muted); margin:12px 0 4px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>IT331 — Exam Practice</h1>
+    <p>Pick a chapter and test yourself. Instant feedback + final score.</p>
+  </header>
+
+  <div id="menu" class="grid"></div>
+
+  <div id="quiz" class="hidden">
+    <div class="topbar">
+      <button class="btn ghost" style="margin:0;padding:8px 16px" onclick="goMenu()">← Chapters</button>
+      <span id="counter"></span>
+      <span id="scoreLive"></span>
+    </div>
+    <div class="progress"><div id="bar"></div></div>
+    <div class="qcard">
+      <span class="qtype" id="qtype"></span>
+      <div class="qtext" id="qtext"></div>
+      <div id="opts"></div>
+      <div id="fb"></div>
+      <button class="btn hidden" id="nextBtn" onclick="next()">Next →</button>
+    </div>
+  </div>
+
+  <div id="done" class="hidden result">
+    <div class="score" id="finalScore"></div>
+    <p id="finalMsg"></p>
+    <button class="btn" onclick="retry()">Retry Chapter</button>
+    <button class="btn ghost" onclick="goMenu()">Back to Chapters</button>
+  </div>
+</div>
+
+<script>
+// q: question, o: options (2 = True/False), a: index of correct answer, e: explanation
+const CHAPTERS = [
+{name:"Ch1: Introduction to Integrated Systems", qs:[
+ {q:"What is an integrated system?", o:["A standalone application running on one machine","A collection of interconnected components that work together as a unified solution","A database with multiple tables","A programming language for integration"], a:1, e:"An integrated system is a collection of interconnected components (software, databases, hardware, cloud, etc.) working as a unified solution."},
+ {q:"Which of the following is NOT listed as a challenge of integration?", o:["Scalability","Interoperability","Security","Marketing"], a:3, e:"The challenges include scalability, communication, interoperability, security, performance, and reliability — not marketing."},
+ {q:"True or False: Integration can occur inside a single chip.", o:["True","False"], a:0, e:"Integration can occur inside a single chip, within one application, between multiple systems, and across cloud/distributed platforms."},
+ {q:"Software components usually communicate through:", o:["APIs, middleware, and messaging protocols","Only direct memory access","Only shared files","USB connections"], a:0, e:"Software communication happens through APIs, middleware, and messaging protocols."},
+ {q:"Which are examples of hardware communication standards & interfaces?", o:["HTML, CSS, JSON","AXI, SPI, I2C, PCIe, Ethernet","SOAP, REST, WSDL","MVC, MVP, MVVM"], a:1, e:"Hardware communication standards include AXI, SPI, I2C, PCIe, and Ethernet."},
+ {q:"Heterogeneous computing means a system may combine:", o:["Only multiple CPUs of the same type","CPUs, GPUs, FPGAs, TPUs, NPUs and AI chips","Multiple operating systems only","Several databases"], a:1, e:"Heterogeneous systems combine CPUs, FPGAs, GPUs, TPUs, NPUs, and dedicated AI chips for performance, energy efficiency, and workload specialization."},
+ {q:"Software controls hardware through:", o:["Device drivers, memory-mapped I/O, interrupts, runtime systems","HTML pages","SQL queries only","Spreadsheets"], a:0, e:"Software controls hardware via device drivers, memory-mapped I/O, interrupts, and runtime systems like OpenCL."},
+ {q:"True or False: A System-on-Chip (SoC) integrates processors, memory, communication interfaces, peripherals, and accelerators into a single chip.", o:["True","False"], a:0, e:"That is exactly the definition of SoC platforms."},
+ {q:"Which step comes FIRST in the typical system integration process?", o:["Deployment & Monitoring","Testing & Validation","Requirements Analysis","Interface Definition"], a:2, e:"The order is: Requirements Analysis → System Design → Interface Definition → Integration & Communication → Testing & Validation → Deployment & Monitoring."},
+ {q:"True or False: 'Integration is not accidental; it requires architectural decisions.'", o:["True","False"], a:0, e:"This is the key takeaway — integration requires deliberate architectural decisions."}
+]},
+{name:"Ch2: Architectural Design & Patterns (IT331-1)", qs:[
+ {q:"According to IEEE 1471-2000, architecture is:", o:["The source code of a system","The fundamental organization of a system embodied in its components, their relationships, and design principles","Only the database schema","The user interface design"], a:1, e:"IEEE 1471-2000 defines architecture as the fundamental organization of a system embodied in its components, relationships, and guiding principles."},
+ {q:"Architectural design is described as:", o:["A creative activity identifying software components and their relationships based on customers' requirements","An automated process done by compilers","Writing test cases","Database normalization"], a:0, e:"Architectural design is a creative activity to identify components and relationships from customer requirements — and it's the first stage of software design."},
+ {q:"True or False: Architectural design is the first stage in the software design process.", o:["True","False"], a:0, e:"Correct — architectural design comes first."},
+ {q:"In the pipe and filter architecture, the component that feeds the pipeline with data is the:", o:["Sink","Filter","Pump","Adapter"], a:2, e:"Pump feeds data, Filter transforms data, Sink collects data and terminates the pipeline."},
+ {q:"True or False: The pipe and filter style is well suited for interactive systems.", o:["True","False"], a:1, e:"It is NOT really suitable for interactive systems; it's used in data processing systems (batch sequential)."},
+ {q:"In MVC, which component responds to user actions by updating the Model?", o:["View","Controller","Model","Router"], a:1, e:"The Controller responds to user actions (from the View) by updating the Model and View."},
+ {q:"In a layered architecture, each layer relies on:", o:["All other layers","The facilities and services of the layer immediately beneath it","Only the top layer","External services only"], a:1, e:"Each layer relies only on the layer immediately beneath it; interface changes affect only adjacent layers."},
+ {q:"The repository architecture is best suited when:", o:["No data is shared","Large amounts of data are shared and generated by one component and used by another","Real-time hardware control is needed","Only one component exists"], a:1, e:"Repository: data in a central shared repository; components interact through it; great for sharing large amounts of data."},
+ {q:"A disadvantage of the repository architecture is:", o:["Components are too independent","Communication between components may be inefficient","Data changes aren't visible to others","It cannot store data"], a:1, e:"Its main drawback: communication through the repository may be inefficient."},
+ {q:"Client-Server architecture is composed of:", o:["Servers, clients, and a network","Only databases","Pumps, filters, sinks","Layers and tiers only"], a:0, e:"C/S = a set of servers offering services + clients calling them + a network allowing access."},
+ {q:"If performance is critical, the architecture should:", o:["Use many small distributed components","Localize critical operations and minimize communication using fewer large components on the same computer","Add more firewalls","Use fine-grained components everywhere"], a:1, e:"Performance: localize critical operations, minimize communication, use a small number of relatively large components on the same computer."},
+ {q:"If security is critical, you should use:", o:["A layered architecture with critical assets protected in the inner layers","A flat architecture","Client-side validation only","Public APIs for everything"], a:0, e:"Security: layered architecture with critical assets in inner layers and high validation applied to those layers."}
+]},
+{name:"Ch3: N-Tier Architecture (IT331-2)", qs:[
+ {q:"'Layers' vs 'Tiers' — the difference is:", o:["Layers are physical, tiers are logical","Layers are logical separation, tiers are physical separation","They are exactly the same","Tiers only exist in databases"], a:1, e:"Layers = logical separation; Tiers = physical separation."},
+ {q:"The main benefits of N-tier/3-tier are:", o:["Maintainability, Scalability, Flexibility, Availability","Speed, Cost, Color, Size","Encryption, Hashing, Signing","Only performance"], a:0, e:"The four main benefits: Maintainability, Scalability, Flexibility, and Availability."},
+ {q:"True or False: Communication between tiers is typically asynchronous to support better scalability.", o:["True","False"], a:0, e:"Asynchronous communication between tiers supports better scalability."},
+ {q:"In a thin-client model:", o:["All processing happens on the client","Only the presentation layer runs on the client; everything else on the server","The database runs on the client","There is no server"], a:1, e:"Thin client = presentation on the client; data management, application processing, and database on the server."},
+ {q:"A major disadvantage of the thin-client model is:", o:["Heavy processing load on the server and network","Too much logic on the client","No GUI possible","It cannot use databases"], a:0, e:"Thin-client places a heavy processing load on both the server and the network."},
+ {q:"A disadvantage of the fat-client model is:", o:["No processing on the client","New versions of the application must be installed on ALL clients","The server does all the work","It's simpler to manage than thin-client"], a:1, e:"Fat-client is more complex to manage and new versions must be installed on all clients."},
+ {q:"In a 3-tier architecture, the middle tier contains:", o:["The database","Most of the business logic, communicating between client and data tier","Only the GUI","The operating system"], a:1, e:"The middle (business logic) tier holds most business logic and communicates between client and data tiers."},
+ {q:"The nth tier only has to know how to:", o:["Communicate with every tier in the system","Handle requests from the n+1th tier and forward to the n-1th tier","Talk to the database directly","Render the user interface"], a:1, e:"Each tier is independent except for those immediately above and below it."},
+ {q:"True or False: Thin clients are always the best choice and three is always the best number of tiers.", o:["True","False"], a:1, e:"Neither is always best — choices depend on requirements."},
+ {q:"Which is a challenge of N-tier architectures?", o:["Load balancing is quite difficult","No new technologies to learn","Designing reusable objects is trivial","No middleware needed"], a:0, e:"Challenges include third-party middleware, heterogeneity, many new technologies, hard-to-design reusable objects, slow protocols, and difficult load balancing."},
+ {q:"Thin clients are generally:", o:["Web browsers","C++ desktop apps","Java applications with MFC","Hardware terminals only"], a:0, e:"Thin clients are generally web browsers; the important choice is made in the middle tier."}
+]},
+{name:"Ch4: Creating N-Tier Services (IT331-3)", qs:[
+ {q:"A 'service' in N-Tier terminology is:", o:["A physical server","A component (class or set of classes) that performs a piece of functionality for an application","A network cable","An operating system process only"], a:1, e:"A service is a component that performs a piece of functionality; it can reside on one machine or be spread across machines."},
+ {q:"Which service handles authenticating and authorizing users?", o:["User Tracking","Security Management","Log Management","Configuration Management"], a:1, e:"Security Management handles authentication and authorization, allowing certain users in and hiding menu items/fields."},
+ {q:"The Data Access Service model says: if you have 10 tables, you create:", o:["1 class for everything","10 classes — one class per table","100 classes","No classes"], a:1, e:"One class per database object (table, stored procedure, view) — each handles add/edit/delete/retrieve for that object."},
+ {q:"The Data Layer Service is where you:", o:["Place reusable methods that interact with the database itself (e.g., wrap ADO.NET calls)","Design the UI","Store business rules","Write HTML"], a:0, e:"The Data Layer wraps all calls to ADO.NET — the reusable database interaction methods."},
+ {q:"True or False: Business rule classes perform select, insert, update and delete directly.", o:["True","False"], a:1, e:"Business rule classes do NOT do CRUD directly — they inherit from the data access classes that do."},
+ {q:"Why is embedding business logic in the UI layer a problem?", o:["It makes the UI faster","Duplicated logic across applications creates a maintenance nightmare","It improves security","It reduces code size"], a:1, e:"With several apps using the same database, you'd duplicate rules; changing one rule means changing all apps."},
+ {q:"Putting as much logic as possible on the database server leads to:", o:["Less network traffic","Lots of network traffic and heavy server load just to check business rules","Perfect performance","Simpler SQL"], a:1, e:"It causes round trips, network traffic, and server load — and SQL is not robust enough for complex logic."},
+ {q:"An advantage of separating services into components is:", o:["Harder unit testing","Easier unit testing — each service tested independently leads to better quality code","More duplicated code","Slower development always"], a:1, e:"Separation enables reuse, easier unit testing, less client code, centralized maintenance, and workload distribution."},
+ {q:"The first steps to achieve N-Tier are:", o:["Remove data access routines and business rule logic from forms/pages, then put them into class modules","Buy more servers","Rewrite everything in SQL","Merge all layers into one"], a:0, e:"Step 1: remove data access from forms. Step 2: remove business rules. Then put both into class modules."},
+ {q:"True or False: If a client bypasses the business rules component, the database server should still maintain data integrity.", o:["True","False"], a:0, e:"The database's job is to maintain integrity no matter what — restrict direct access using built-in security features."},
+ {q:"The main disadvantage of the Business Rules Server is summarized in one word:", o:["Simplicity","Overhead","Security","Cheapness"], a:1, e:"'In a word: overhead!' — more tiers means more overhead getting to the data."},
+ {q:"A benefit of Data Classes is:", o:["The form designer must understand data access internals","Division of labor — one programmer does data/business classes, another does forms","Code duplication increases","They work in only one language"], a:1, e:"Benefits: division of labor, centralized access (no duplicate code), reusable DLLs usable from any language/product."}
+]},
+{name:"Ch5: Presentation Layer (IT331-4)", qs:[
+ {q:"The presentation layer contains components that:", o:["Manage the database","Implement and display the user interface and manage user interaction","Define business rules","Handle network routing"], a:1, e:"The presentation layer implements/displays the UI and manages user interaction."},
+ {q:"The two typical component types in the presentation layer are:", o:["UI components and Presentation Logic components","Database and Network components","Business entities and workflows","Service agents and data helpers"], a:0, e:"UI components (visual elements) and Presentation Logic components (Presenter, Presentation Model, ViewModel)."},
+ {q:"Caching improves:", o:["Application performance and UI responsiveness","Database size","Code readability","Security only"], a:0, e:"Caching improves performance and responsiveness by avoiding network round trips and duplicate processing."},
+ {q:"True or False: You should cache sensitive data without encryption for speed.", o:["True","False"], a:1, e:"Do NOT cache sensitive data unless you encrypt it."},
+ {q:"A 'cache hit' means:", o:["The file is not in cache and is retrieved from origin","The requested file is found in cache and delivered from it","The cache was deleted","The server crashed"], a:1, e:"Cache hit = found in cache; cache miss = retrieved from the original source."},
+ {q:"For long-running actions in the UI you should:", o:["Block the UI until done","Use asynchronous operations / worker threads and give progress feedback","Restart the application","Hide the screen"], a:1, e:"Use async operations or worker threads (AJAX in ASP.NET) and provide progress feedback; consider letting users cancel."},
+ {q:"'Chatty' vs 'chunky' calls means:", o:["Many smaller requests vs one large request","Fast vs slow networks","Encrypted vs plain requests","Local vs remote storage"], a:0, e:"Chatty = many small requests; chunky = one large request. Consider which fits expensive remote calls."},
+ {q:"For communication between presentation components, prefer:", o:["Tight coupling","Loosely coupled patterns such as Publish/Subscribe","Global variables","Direct database access"], a:1, e:"Publish/Subscribe lowers coupling and improves testability and flexibility."},
+ {q:"Input validation vs business rule validation:", o:["Both belong in the data layer","Input validation in the presentation layer; business rule validation in the business layer","Both in the presentation layer","Neither is needed"], a:1, e:"Presentation layer handles input validation; the business layer handles business rule validation."},
+ {q:"Your validation strategy should:", o:["Constrain, reject, and sanitize malicious input","Trust all user input","Only check on the server once a year","Only validate numbers"], a:0, e:"Design validation to constrain, reject, and sanitize malicious input."},
+ {q:"To improve testability and separate UI from business logic in web apps, consider:", o:["ASP.NET MVC Framework","More view state","Inline SQL in pages","Hard-coded strings"], a:0, e:"ASP.NET MVC supports a model-view-controller approach improving testability and separation."},
+ {q:"True or False: In ASP.NET, view state should be used freely since it has no performance cost.", o:["True","False"], a:1, e:"Use view state cautiously — it increases data per round trip and can reduce performance."}
+]},
+{name:"Ch6: Business Layer (IT331-5)", qs:[
+ {q:"The goal of a software architect when designing a business layer is to:", o:["Maximize code volume","Minimize complexity by separating tasks into different areas of concern","Merge all logic into one class","Avoid documentation"], a:1, e:"Minimize complexity via separation of concerns (business processing, workflow, entities)."},
+ {q:"An Application Façade:", o:["Combines multiple business operations into a single message-based operation","Is a required component in every app","Stores data permanently","Renders the UI"], a:0, e:"The (optional) application façade combines multiple business operations into one message-based operation."},
+ {q:"Business entity components are used to:", o:["Pass data between components, representing real-world entities like products and orders","Encrypt passwords","Draw the user interface","Route network traffic"], a:0, e:"Business entities pass data between components (DataSets, XML, or custom OO classes)."},
+ {q:"Business workflows are used when:", o:["A process has multiple steps that must be performed in the correct order and orchestrated","There is only one step","No data is involved","The UI needs colors"], a:0, e:"Workflows define and coordinate long-running, multi-step business processes."},
+ {q:"Authentication vs Authorization:", o:["Authentication verifies identity; authorization controls access to resources","They are identical","Authorization verifies identity","Authentication assigns colors to users"], a:0, e:"Authentication = securely verifying identity; Authorization = ensuring authenticated users access only approved resources."},
+ {q:"True or False: It is good practice to mix authorization code and business processing code.", o:["True","False"], a:1, e:"Mixing authorization code and business processing code is listed as a common mistake."},
+ {q:"Which is a caching mistake in the business layer?", o:["Caching volatile data","Caching data in ready-to-use format","Encrypting sensitive cached data","Caching only what's needed"], a:0, e:"Mistakes: caching volatile data, too much data, not ready-to-use format, and unencrypted sensitive data."},
+ {q:"To reduce round trips when accessing a remote business layer, use:", o:["Coarse-grained packages like Data Transfer Objects and a remote façade","Many tiny requests","Direct DB access from UI","Inline SQL"], a:0, e:"Use coarse-grained data packages (DTOs) and consider a remote façade for the interface."},
+ {q:"True or False: The business layer should access the database directly.", o:["True","False"], a:1, e:"Accessing the database directly from the business layer is a common mistake — use the data layer."},
+ {q:"Using exceptions to control application logic flow is:", o:["A best practice","A common mistake to avoid","Required by .NET","The fastest approach"], a:1, e:"Do not use exceptions for application logic; that's listed as an exception-management mistake."},
+ {q:"Relying only on validation that occurs in the presentation layer is:", o:["Safe and sufficient","A validation mistake — the business layer must validate too","Required by standards","Faster and recommended"], a:1, e:"Relying on presentation-layer validation is a common mistake; validate range, type, and format in the business layer and reuse validation logic."}
+]},
+{name:"Ch7: Data Layer (IT331-6)", qs:[
+ {q:"Typical components of the data layer are:", o:["Data Access components and Service Agents","UI components and ViewModels","Workflows and Facades","Controllers and Views"], a:0, e:"Data layer = Data Access components (abstract data store logic) + Service Agents (handle external service calls)."},
+ {q:"Service agents:", o:["Isolate the requirements for calling external services, and may add caching, offline support, and data mapping","Draw charts","Replace databases","Are part of the presentation layer"], a:0, e:"Service agents manage communication semantics with external services plus caching/offline/mapping."},
+ {q:"Connections guideline: you should open connections:", o:["As early as possible and keep them open","As late as possible and close them as early as possible","Once a day","Only on Mondays"], a:1, e:"Open late, close early; never hold connections open for excessive periods."},
+ {q:"To prevent SQL injection, you should:", o:["Use parameterized SQL queries and typed parameters","Use string concatenation with user input","Disable the firewall","Use longer table names"], a:0, e:"Parameterized queries + typed parameters mitigate SQL injection; never build dynamic queries by concatenating user input."},
+ {q:"A BLOB is:", o:["Data stored and retrieved as a single stream whose structure is not apparent to the database","A small integer","A type of network protocol","An XML schema"], a:0, e:"Binary Large OBject — a single stream; internal structure invisible to the DB/data layer."},
+ {q:"For data-intensive operations, which performs operations closer to the data?", o:["Dynamic SQL in the client","Stored procedures","HTML forms","CSS"], a:1, e:"Stored procedures run closer to the data, which can improve performance."},
+ {q:"When is dynamic SQL often the best choice?", o:["For small applications with a single client and few business rules","For huge multi-client enterprise apps","Never","Only with Oracle"], a:0, e:"Small app + single client + few business rules → dynamic SQL is often best. It's also easier to debug."},
+ {q:"Transactions should be:", o:["As long as possible","As short as possible to minimize lock time","Avoided entirely","Run only at night"], a:1, e:"Keep transactions short to minimize the time locks are held; use appropriate isolation levels."},
+ {q:"In a green field environment (full control over the schema), an O/RM tool can:", o:["Generate a schema to support the defined object model","Only read data","Replace the network","Design the UI"], a:0, e:"Green field: O/RM generates schema from the object model. Brown field: O/RM maps domain model to the EXISTING schema."},
+ {q:"Partially loading domain entities with only required data is called:", o:["Eager loading","Lazy loading","Pre-loading","Hot loading"], a:1, e:"Lazy loading loads entities partially with only the required data."},
+ {q:"When storing passwords you should use:", o:["Plain text","A salted hash instead of an encrypted version","Base64 encoding","The username as password"], a:1, e:"Use a salted hash — not encryption, not plain text."},
+ {q:"True or False: It's recommended to locate the data access layer on the same server as the database.", o:["True","False"], a:1, e:"Consider a DIFFERENT server: DB servers are optimized for their role; combining both on one tier likely reduces performance."}
+]},
+{name:"Ch8: Service Layer (IT331-7)", qs:[
+ {q:"A key concept of the service layer is that a service should:", o:["Expose all internal business entities","Never expose internal entities used by the business layer","Always use the database directly","Skip validation"], a:1, e:"A service should never expose internal processes or business entities; use translator components and data contracts."},
+ {q:"The two typical components of the service layer are:", o:["Service interfaces and Message types","Controllers and Views","Tables and Indexes","Threads and Processes"], a:0, e:"Service interfaces (façade exposing business logic) and Message types (wrapping data structures)."},
+ {q:"Idempotency means:", o:["Messages must arrive in order","You could receive duplicate messages but should handle only one","All messages are encrypted","Services run once a day"], a:1, e:"Idempotency: detect and manage repeated messages, handling only one."},
+ {q:"Commutativity means the service can:", o:["Manage messages arriving out of order","Compress data","Reject all messages","Speak multiple languages"], a:0, e:"Commutativity = handling messages that arrive out of order."},
+ {q:"If a message passes through intermediaries, you should always use:", o:["Transport layer security only","Message-based security","No security","FTP"], a:1, e:"With transport security the message is decrypted/re-encrypted at each intermediary — a risk. Use message-based security (or both for maximum security)."},
+ {q:"REST is:", o:["An architectural pattern built with simple verbs that overlay well on HTTP","An XML-only messaging protocol","A database engine","A programming language"], a:0, e:"REST = architectural pattern using simple verbs over HTTP; SOAP = XML-based messaging protocol usable over any transport."},
+ {q:"True or False: REST is stateless — each request must contain all information necessary to understand it.", o:["True","False"], a:0, e:"REST is stateless by nature; the server doesn't store session state."},
+ {q:"Which approach is often better suited for publicly accessible services with unknown consumers?", o:["REST","SOAP","CORBA",".NET Remoting"], a:0, e:"REST suits public services/unknown consumers; SOAP suits procedural interactions between layers."},
+ {q:"The WS-* standards used with SOAP provide:", o:["A standard, interoperable way to handle security, transactions, addressing, and reliability","Graphics rendering","CSS styling","Database indexing"], a:0, e:"WS-Security, WS-Trust etc. give SOAP standard handling of security, transactions, addressing, reliability."},
+ {q:"True or False: You should implement business rules in the service interface.", o:["True","False"], a:1, e:"Do NOT implement business rules in a service interface — that's a listed mistake."},
+ {q:"If the service is publicly accessible from the Internet, use which transport?", o:["HTTP","TCP","Named pipes","Shared memory"], a:0, e:"Public Internet → HTTP. Local network apps → TCP. Same physical tier → named pipes/shared memory."},
+ {q:"Design step 1 for the service layer is:", o:["Define the data and message contracts (schema used for messages)","Design the database first","Write the UI","Choose the colors"], a:0, e:"Steps: 1) data/message contracts, 2) service contracts, 3) fault contracts, 4) transformation objects, 5) abstraction to the business layer."}
+]},
+{name:"Ch9: Intersystem Communication (Middleware, VMs)", qs:[
+ {q:"Sockets are considered:", o:["High-level and simple","Low-level and complex — the programmer handles IPs, ports, protocols, data representation","A type of database","A web framework"], a:1, e:"Sockets = low-level & complex; the programmer implements the entire communication lifecycle."},
+ {q:"With RPC, a call across the network is treated:", o:["The same as a local procedure call","As an email","As a database query","As a file download"], a:0, e:"RPC abstracts the network: remote calls look like local calls — location transparency."},
+ {q:"In distributed object-oriented communication, the client calls a local object called a:", o:["Proxy","Sink","Trigger","Socket"], a:0, e:"Client calls the Proxy → proxy sends the request → remote object executes → result returns through the proxy."},
+ {q:"In MOM (Message-Oriented Middleware), client and server:", o:["Communicate directly","Do not communicate directly — a middleman with a message queue sits between them","Share the same memory","Must use the same language"], a:1, e:"MOM introduces a middleman (nearly always with a message queue); communication is asynchronous."},
+ {q:"In SOA, a 'service' is described as a:", o:["Repetitive and logical business activity like 'check customer credit'","Web page","Single function call","Hardware device"], a:0, e:"A service is a repetitive, logical business activity; the consumer sees it as a black box."},
+ {q:"The recommended SOA adoption strategy is:", o:["Top-Down","Bottom-Up — wrapping existing legacy code","No strategy","Random"], a:1, e:"Bottom-Up (developer-driven, wrapping legacy code) gives incremental progress and natural refactoring; Top-Down risks high cost and slow results."},
+ {q:"Which is a limitation of SOA?", o:["High reusability","Increased overhead and complex service management","Improved maintainability","Extensibility"], a:1, e:"Limitations: overhead, complex management, high investment cost, security in loose coupling, XML efficiency."},
+ {q:"SOAP messages contain:", o:["Envelope, Header, and Body","Subject, CC, BCC","Table, Row, Column","Class, Object, Method"], a:0, e:"Envelope (describes message), Header (features), Body (primary info) — like snail mail: envelope = address, body = letter."},
+ {q:"WSDL is used to:", o:["Describe network services — address, parameters, protocols","Encrypt messages","Store data","Render HTML"], a:0, e:"WSDL answers: what's the address, required parameters, protocols — SOAP alone doesn't say what the message should contain."},
+ {q:"UDDI is:", o:["An XML-based registry for businesses to list and locate web services","A programming language","A database engine","A type of firewall"], a:0, e:"UDDI = platform-independent XML registry to register and locate web services."},
+ {q:"A Type 1 hypervisor:", o:["Runs directly on the host's hardware (e.g., Xen, KVM)","Runs as an app on a host OS (e.g., VirtualBox)","Is a web browser","Runs only in the cloud"], a:0, e:"Type 1 = bare-metal (Xen, KVM); Type 2 = hosted, running on a host OS (VirtualBox)."},
+ {q:"VMs vs Containers — the rule of thumb:", o:["Use VMs for full isolation; use containers for fast, scalable microservices","Containers are heavier than VMs","VMs boot in milliseconds","Containers include a full guest OS"], a:0, e:"VMs: heavy, full Guest OS, slower boot, full isolation. Containers: lightweight, share host kernel, fast, portable."},
+ {q:"Why use VMs in middleware & SOA?", o:["Isolation — if one service crashes it doesn't affect services in other VMs","To slow things down","To avoid using networks","To remove the need for security"], a:0, e:"Isolation + heterogeneity (Linux middleware with Windows legacy on one physical server); JVM/CLR are 'process VMs'."}
+]},
+{name:"Ch10: Integrative Coding & Design Patterns", qs:[
+ {q:"Integrative coding is:", o:["Writing code that enables different systems and components to work together","Writing code in one language only","Compiling code faster","Designing logos"], a:0, e:"It focuses on communication between systems, data exchange, and reusability."},
+ {q:"Architectural pattern vs design pattern:", o:["Architectural = high-level system structure; Design = low-level class/component problems","They are identical","Design patterns define the whole system","Architectural patterns are only for databases"], a:0, e:"Architectural (e.g., N-Tier) = overall structure; Design (e.g., Adapter, Facade, Proxy) = specific class-level problems."},
+ {q:"Which pattern is used when connecting to external or legacy systems?", o:["Adapter","Observer","Iterator","Singleton"], a:0, e:"Adapter connects to external/legacy systems; Façade simplifies access; Proxy controls access."},
+ {q:"The Façade pattern:", o:["Simplifies access to multiple services","Creates objects","Iterates collections","Notifies observers"], a:0, e:"Façade = simplified access to multiple services."},
+ {q:"The Proxy pattern:", o:["Controls access to services (security, remote calls)","Stores data","Renders UI","Defines schemas"], a:0, e:"Proxy controls access — e.g., security checks or remote calls."},
+ {q:"Singleton, Factory Method, and Abstract Factory are examples of:", o:["Creational patterns","Structural patterns","Behavioral patterns","Architectural patterns"], a:0, e:"Creational = how objects are created. Structural = how organized/connected. Behavioral = how they interact."},
+ {q:"The Observer pattern:", o:["Notifies multiple objects automatically when one object's state changes","Selects algorithms at runtime","Iterates collections","Adapts interfaces"], a:0, e:"Observer = automatic notification on state change. Strategy = select behavior at runtime. Iterator = sequential access."},
+ {q:"The Strategy pattern allows:", o:["Selecting one algorithm or behavior from multiple options at runtime","Only one fixed algorithm","Direct DB access","Faster compilation"], a:0, e:"Strategy = choose among algorithms/behaviors at runtime."},
+ {q:"Which format is used for DISPLAY, not data exchange?", o:["HTML","XML","JSON","CSV"], a:0, e:"HTML is for display; XML is structured/descriptive; JSON is widely used in modern systems for exchange."},
+ {q:"True or False: Every XML document must contain one root element.", o:["True","False"], a:0, e:"One root element is mandatory in every XML document."},
+ {q:"In <Student ID=\"1001\">, ID=\"1001\" is:", o:["An attribute","An element","A closing tag","A root"], a:0, e:"ID=\"1001\" is an attribute — additional information on the element."},
+ {q:"DTD vs XSD:", o:["DTD defines structure only; XSD defines structure AND data types","XSD is simpler than DTD","DTD defines data types","They are the same thing"], a:0, e:"DTD = structure (simple, limited). XSD = structure + data types + constraints (more powerful and flexible)."}
+]},
+{name:"Ch11: End-to-End Data Exchange Pipeline", qs:[
+ {q:"The correct order of the end-to-end data exchange pipeline is:", o:["Database → SQL → XML → DTD → XPath → XSLT → Target System","XML → SQL → Database → XSLT → DTD","XSLT → XPath → DTD → XML → SQL","Database → XSLT → SQL → XPath"], a:0, e:"DB (relational data) → SQL (extraction) → XML (exchange format) → DTD (validation) → XPath (selection) → XSLT (transformation) → Target."},
+ {q:"In the pipeline, SQL is used for:", o:["Data extraction from the source system","Validation","Transformation","Display"], a:0, e:"SQL retrieves the required data from the source system."},
+ {q:"Converting relational data to XML: tables become…", o:["Nested elements","Rows","Stored procedures","Indexes"], a:0, e:"Rows & columns → hierarchical structure; tables → nested elements; fixed schema → flexible structured data."},
+ {q:"DTD validation on the receiver side checks:", o:["Required elements, order, and required attributes","Colors and fonts","Network speed","Password strength"], a:0, e:"The receiver validates required elements, element order, and required attributes; invalid XML is rejected."},
+ {q:"In DTD, #PCDATA means:", o:["Parsed Character Data","Private Coded Data","Public Class Data","Partial Column Data"], a:0, e:"#PCDATA = Parsed Character Data; other element types: child elements, ANY, EMPTY."},
+ {q:"In <!DOCTYPE note [...]>, 'note' is:", o:["The root element being defined","An attribute","A comment","A stylesheet"], a:0, e:"The DOCTYPE declaration defines the root element of the document."},
+ {q:"The two ways of writing DTD rules are:", o:["External declaration (separate file) and Internal declaration (inside the XML)","Public and Private","Fast and Slow","Compiled and Interpreted"], a:0, e:"External DTD lives in a .dtd file; Internal DTD is declared inside the XML file itself."},
+ {q:"XPath is used to:", o:["Select specific elements from an XML document","Encrypt XML","Compress XML","Convert XML to a database"], a:0, e:"XPath extracts only the needed parts, e.g. /SecurityAudit/AccessRecord/Resource."},
+ {q:"What does the XPath //Resource return?", o:["All <Resource> elements in the document","Only the first Resource","The root element","An attribute"], a:0, e:"// selects all matching elements anywhere in the document."},
+ {q:"What does /AccessRecord/@UserID select?", o:["The UserID attribute values","The element text","The whole document","Nothing"], a:0, e:"@ selects attributes — here it returns the UserID values (101, 102, 103)."},
+ {q:"XSLT is used to:", o:["Transform XML into another format (HTML, another XML, text/CSV)","Validate structure","Query databases","Manage memory"], a:0, e:"XSLT transforms XML into the format the target system needs — HTML dashboards, other XML structures, CSV/text reports."},
+ {q:"On the sender side of the pipeline, which steps happen?", o:["Relational DB → SQL extraction → XML representation","DTD validation → XPath → XSLT","Only XSLT","Only XPath"], a:0, e:"Sender: DB, SQL extraction, XML representation. Receiver: DTD validation, XPath selection, XSLT transformation."}
+]}
+];
+
+let cur=null, qi=0, score=0, order=[];
+
+const menu=document.getElementById('menu');
+CHAPTERS.forEach((c,i)=>{
+  const d=document.createElement('div'); d.className='chap';
+  d.innerHTML=`<h3>${c.name}</h3><span>${c.qs.length} questions</span>`;
+  d.onclick=()=>start(i); menu.appendChild(d);
+});
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function start(i){
+  cur=CHAPTERS[i]; qi=0; score=0;
+  order=shuffle([...Array(cur.qs.length).keys()]);
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('done').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  show();
+}
+function show(){
+  const q=cur.qs[order[qi]];
+  document.getElementById('counter').textContent=`Question ${qi+1} / ${cur.qs.length}`;
+  document.getElementById('scoreLive').textContent=`Score: ${score}`;
+  document.getElementById('bar').style.width=(qi/cur.qs.length*100)+'%';
+  document.getElementById('qtype').textContent=q.o.length===2?'True / False':'Multiple Choice';
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('fb').innerHTML='';
+  document.getElementById('nextBtn').classList.add('hidden');
+  const box=document.getElementById('opts'); box.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.o.forEach((opt,idx)=>{
+    const b=document.createElement('button'); b.className='opt';
+    b.textContent=(q.o.length===2?'':letters[idx]+'.  ')+opt;
+    b.onclick=()=>answer(idx,q,box); box.appendChild(b);
+  });
+}
+function answer(idx,q,box){
+  [...box.children].forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.a)b.classList.add('correct');
+    else if(i===idx)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  if(idx===q.a){score++; fb.innerHTML=`<div class="feedback ok">✅ Correct! ${q.e}</div>`;}
+  else fb.innerHTML=`<div class="feedback no">❌ Not quite. ${q.e}</div>`;
+  document.getElementById('scoreLive').textContent=`Score: ${score}`;
+  document.getElementById('nextBtn').classList.remove('hidden');
+}
+function next(){
+  qi++;
+  if(qi<cur.qs.length) show();
+  else finish();
+}
+function finish(){
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('done').classList.remove('hidden');
+  const pct=Math.round(score/cur.qs.length*100);
+  document.getElementById('finalScore').textContent=`${score} / ${cur.qs.length}`;
+  let msg= pct===100?'🏆 Perfect! You\'re exam-ready for this chapter.':
+           pct>=80?'🎉 Excellent! Just a quick review of the misses.':
+           pct>=60?'👍 Good — review the explanations and try again.':
+           '📖 Keep studying this chapter, then retry.';
+  document.getElementById('finalMsg').textContent=`${pct}% — ${msg}`;
+}
+function retry(){ start(CHAPTERS.indexOf(cur)); }
+function goMenu(){
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('done').classList.add('hidden');
+  document.getElementById('menu').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
