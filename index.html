@@ -68,8 +68,8 @@
   /* satellite micro-CTA */
   .chap::after{content:'→'; position:absolute; top:28px; right:28px; width:44px; height:44px; border-radius:50%;
     background:var(--btn-bg); color:var(--btn-text); display:flex; align-items:center; justify-content:center;
-    font-size:18px; transition:transform .25s cubic-bezier(.22,1,.36,1);}
-  .chap:hover::after{transform:translateX(4px);}
+    font-size:18px; transition:transform .5s cubic-bezier(.25,.1,.25,1);}
+  .chap:hover::after{transform:rotate(-45deg);}
   /* signature tile — past exams */
   .chap.spotlight{background:var(--signal);}
   .chap.spotlight:hover{background:#e04e00;}
@@ -113,6 +113,10 @@
   .btn:active{transform:scale(.97);}
   .btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
   .btn.ghost:hover{background:var(--lifted); opacity:1;}
+  /* vertical text-roll on button hover */
+  .btn .roll{display:inline-flex; flex-direction:column; overflow:hidden; height:1.2em; vertical-align:-.18em;}
+  .btn .roll span{display:block; line-height:1.2em; transition:transform .5s cubic-bezier(.25,.1,.25,1);}
+  .btn:hover .roll span{transform:translateY(-100%);}
 
   .result{text-align:center; background:var(--lifted); border-radius:40px; padding:96px 40px;
     box-shadow:rgba(0,0,0,.08) 0 24px 48px; animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;}
@@ -541,6 +545,23 @@ document.getElementById('themeBtn').onclick=()=>{
   applyTheme(document.documentElement.hasAttribute('data-theme')?'dark':'light');
 };
 applyTheme(localStorage.getItem('theme')||'dark');
+
+// enhance pill buttons with a vertical text-roll on hover (keeps any icon in place)
+function enhanceRoll(b){
+  if(b.dataset.roll) return;
+  const svg=b.querySelector('svg');
+  const svgFirst=svg && b.firstChild===svg;
+  let label='';
+  [...b.childNodes].forEach(n=>{ if(n.nodeType===3){label+=n.textContent; n.remove();} });
+  label=label.trim();
+  if(!label) return;
+  const roll=document.createElement('span');
+  roll.className='roll';
+  roll.innerHTML=`<span>${label}</span><span aria-hidden="true">${label}</span>`;
+  if(svgFirst) b.appendChild(roll); else b.insertBefore(roll, svg||null);
+  b.dataset.roll='1';
+}
+document.querySelectorAll('.btn').forEach(enhanceRoll);
 </script>
 </body>
 </html>
