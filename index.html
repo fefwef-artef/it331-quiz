@@ -426,6 +426,25 @@ const CHAPTERS = [
 ]}
 ];
 
+// reorder: 7 IT331 lecture chapters, then 4 standalone chapters, then past exams
+const ORDER=[
+  "Ch2: Architectural Design & Patterns",
+  "Ch3: N-Tier Architecture",
+  "Ch4: Creating N-Tier Services",
+  "Ch5: Presentation Layer",
+  "Ch6: Business Layer",
+  "Ch7: Data Layer",
+  "Ch8: Service Layer",
+  "Ch1: Introduction to Integrated Systems",
+  "Ch11: End-to-End Data Exchange Pipeline",
+  "Ch10: Integrative Coding & Design Patterns",
+  "Ch9: Intersystem Communication (Middleware, VMs)",
+  "Past Exams Questions"
+];
+CHAPTERS.sort((a,b)=>ORDER.indexOf(a.name)-ORDER.indexOf(b.name));
+// renumber the ChN: prefix to match the new order
+CHAPTERS.forEach((c,i)=>{ c.name=c.name.replace(/^Ch\d+:\s*/, 'Ch'+(i+1)+': '); });
+
 let cur=null, qi=0, score=0, order=[];
 
 const menu=document.getElementById('menu');
