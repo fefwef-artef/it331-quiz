@@ -79,6 +79,18 @@
   .score{font-family:'Sora',sans-serif; font-size:3.6rem; font-weight:700; letter-spacing:-.03em;
     background:linear-gradient(92deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
   .result p{color:var(--muted); margin:14px 0 6px; font-size:1rem;}
+
+  /* a11y + polish (UI/UX Pro Max rules) */
+  button{cursor:pointer;}
+  .opt:focus-visible,.btn:focus-visible,.chap:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+  .chap{outline:none;}
+  .icon{width:18px; height:18px; vertical-align:-3px; margin-right:6px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .btn .icon{margin:0 0 0 6px;}
+  .chip{display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:.83rem;}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+  }
+  @media (max-width:480px){ .qcard{padding:22px;} header{margin-bottom:28px;} }
 </style>
 </head>
 <body>
@@ -93,7 +105,7 @@
 
   <div id="quiz" class="hidden">
     <div class="topbar">
-      <button class="btn ghost" style="margin:0;padding:8px 16px" onclick="goMenu()">← Chapters</button>
+      <button class="btn ghost" style="margin:0;padding:8px 16px" onclick="goMenu()"><svg class="icon" viewBox="0 0 24 24" style="margin:0 6px 0 0"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Chapters</button>
       <span id="counter"></span>
       <span id="scoreLive"></span>
     </div>
@@ -103,7 +115,7 @@
       <div class="qtext" id="qtext"></div>
       <div id="opts"></div>
       <div id="fb"></div>
-      <button class="btn hidden" id="nextBtn" onclick="next()">Next →</button>
+      <button class="btn hidden" id="nextBtn" onclick="next()">Next<svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
     </div>
   </div>
 
@@ -268,6 +280,66 @@ const CHAPTERS = [
  {q:"What does /AccessRecord/@UserID select?", o:["The UserID attribute values","The element text","The whole document","Nothing"], a:0, e:"@ selects attributes — here it returns the UserID values (101, 102, 103)."},
  {q:"XSLT is used to:", o:["Transform XML into another format (HTML, another XML, text/CSV)","Validate structure","Query databases","Manage memory"], a:0, e:"XSLT transforms XML into the format the target system needs — HTML dashboards, other XML structures, CSV/text reports."},
  {q:"On the sender side of the pipeline, which steps happen?", o:["Relational DB → SQL extraction → XML representation","DTD validation → XPath → XSLT","Only XSLT","Only XPath"], a:0, e:"Sender: DB, SQL extraction, XML representation. Receiver: DTD validation, XPath selection, XSLT transformation."}
+]},
+{name:"Past Exams Questions", qs:[
+ {q:"These are the application's visual elements used to display information to the user and accept user input.", o:["User Interface components","Presentation Logic components","Application façade","None of the above"], a:0, e:"UI components are the visual elements that display information and accept user input."},
+ {q:"Simple Object Access Protocol (SOAP) is responsible for:", o:["Specifying the address of the web service","Specifying the format for message exchange","Specifying the required parameters","Specifying protocols used"], a:1, e:"SOAP specifies the format for message exchange; WSDL covers address, parameters, and protocols."},
+ {q:"________ is a data level description in web services.", o:["WSDL","UDDI","XML","SMTP"], a:2, e:"XML is the data-level description in web services."},
+ {q:"Benefits of the N-tier/3-tier architectural style:", o:["Maintainability","Availability","Scalability","All the above"], a:3, e:"Maintainability, Scalability, Flexibility, and Availability are all benefits — answer: All the above."},
+ {q:"________: Analyze your communication requirements and determine if you need request-response or duplex communication.", o:["Communication","Exception management","Authorization","Message channels"], a:0, e:"This is the Communication design issue of the service layer."},
+ {q:"Which of the following architecture is NOT suitable for interactive systems?", o:["The layered pattern","MVC pattern","The pipe and filter pattern","The repository pattern"], a:2, e:"Pipe and filter is not really suitable for interactive systems."},
+ {q:"Which of the following is considered a limitation of service-oriented architecture?", o:["Overload","High cost","Complex service management","All the above"], a:3, e:"SOA limitations include overhead/overload, high investment cost, and complex service management — all the above."},
+ {q:"In ________ architecture, the communication between components may be inefficient.", o:["The pipe and filter pattern","MVC pattern","The layered pattern","The repository pattern"], a:3, e:"In the repository pattern, communication through the central repository may be inefficient."},
+ {q:"________ is connectivity software that provides a mechanism for processes to interact with other processes running on multiple networked machines.", o:["Transaction Processing Monitor (TPM)","Message-Oriented Middleware (MOM)","Remote Procedure Call (RPC)","Middleware"], a:3, e:"That is the definition of Middleware in general."},
+ {q:"Which layer handles and encapsulates all of the business domains and logic?", o:["Presentation layer","Data layer","Middle layer","Business layer"], a:3, e:"The business layer encapsulates business domains and logic."},
+ {q:"True or False: 'Layers' are a logical separation, 'Tiers' are physical separation.", o:["True","False"], a:0, e:"Layers = logical, tiers = physical. (Careful — exams sometimes flip this to make it False!)"},
+ {q:"True or False: 'Tiers' are a logical separation and 'Layers' are physical separation.", o:["True","False"], a:1, e:"FALSE — it's the opposite: layers are logical, tiers are physical."},
+ {q:"True or False: Sink is the component that feeds a pipeline with data.", o:["True","False"], a:1, e:"FALSE — the Pump feeds the pipeline; the Sink collects the data and terminates the pipeline."},
+ {q:"True or False: The presentation layer exists to provide a user interface, whether the user is a machine or a human being.", o:["True","False"], a:0, e:"True — the 'user' can be a machine or a human."},
+ {q:"True or False: A system based on SOA provides a loosely coupled suite of services usable within multiple separate systems from several business domains.", o:["True","False"], a:0, e:"True — that's a core SOA property."},
+ {q:"True or False: The fundamental problem in client-based networks is that all data on the server must travel to the client for processing.", o:["True","False"], a:0, e:"True — that's the fundamental problem of client-based networks."},
+ {q:"True or False: One disadvantage of n-tier architecture is that it places a greater load on the network.", o:["True","False"], a:0, e:"True — n-tier traffic travels across the network."},
+ {q:"True or False: With two-tier client-server architecture, the client is responsible for business logic and presentation.", o:["True","False"], a:0, e:"True — in the fat-client two-tier model, the client runs business logic and presentation."},
+ {q:"True or False: Data Access components combine multiple business operations into a single message-based operation.", o:["True","False"], a:1, e:"FALSE — that's the Application Façade. Data Access components abstract the logic to access data stores."},
+ {q:"True or False: Client-Server architecture is generally more 'scalable' than a three-tiered architecture.", o:["True","False"], a:1, e:"FALSE — three-tier/n-tier is more scalable than plain client-server."},
+ {q:"True or False: Using a web browser to access a web page from a server on the Internet is a good example of client-server application architecture.", o:["True","False"], a:0, e:"True — browser + web server is classic client-server."},
+ {q:"True or False: By using a thin-client two-tier model we can avoid problems with scalability and performance.", o:["True","False"], a:1, e:"FALSE — thin-client two-tier HAS scalability and performance problems; multi-tier avoids them."},
+ {q:"True or False: In the fat-client model, more processing is delegated to the client as application processing is locally executed.", o:["True","False"], a:0, e:"True — fat client executes application processing locally."},
+ {q:"True or False: Fat-client model is most suitable for new C/S systems where the capabilities of the client system are known in advance.", o:["True","False"], a:0, e:"True — fat-client suits new systems with known client capabilities."},
+ {q:"________ is an architectural style that supports service-orientation.", o:["SOA","MVC","Repository","Layered architecture"], a:0, e:"SOA (Service-Oriented Architecture) supports service-orientation."},
+ {q:"________ usually have at least three separate logical parts, each located on a separate physical server.", o:["One-tier architecture","N-tier architectures","Thin client model","Pump"], a:1, e:"N-tier architectures have at least three logical parts on separate physical servers."},
+ {q:"In the ________, the client runs the application (business logic and presentation) while the server handles persistence of data.", o:["Thin client model","Fat client model","One-tier model","Repository model"], a:1, e:"Fat client = client runs business logic + presentation; server persists data."},
+ {q:"________ are stylized descriptions of good design practice, tried and tested in different environments.", o:["Architectural patterns","Source code","Test cases","Databases"], a:0, e:"Architectural patterns are tried-and-tested stylized descriptions of good design practice for sharing and reusing knowledge."},
+ {q:"________ partitions the concerns of the application into stacked groups (layers).", o:["Layered architecture","Pipe and filter","MVC","Client-server"], a:0, e:"Layered architecture partitions concerns into stacked layers."},
+ {q:"________ decomposes application design into reusable functions or logical components that expose well-defined communication interfaces.", o:["Component-based architecture","Repository architecture","One-tier architecture","Pump"], a:0, e:"Component-based architecture decomposes design into reusable components with well-defined interfaces."},
+ {q:"In pipe and filter architecture, ________ is the component responsible for transforming data.", o:["Pump","Sink","Filter","Pipe"], a:2, e:"Filter transforms data; pump feeds it; sink collects it."},
+ {q:"In MVC pattern, the ________ object encapsulates the data and contains the functionality.", o:["View","Controller","Model","Router"], a:2, e:"The Model encapsulates data and core functionality."},
+ {q:"________ architecture is mainly used when an application does not have to know which data source is implemented or how.", o:["Repository","Pipe and filter","MVC","One-tier"], a:0, e:"Repository architecture hides which data source is implemented and how."},
+ {q:"Match: 'An architectural approach that allows a limited set of operations applied to resources represented by URIs.'", o:["REST","SOAP","SOA","RPC"], a:0, e:"REST = limited operations on URI-addressable resources."},
+ {q:"Match: 'An approach to communicate data by integrating multiple applications.'", o:["Web Service","XML","The accessor","RPC"], a:0, e:"A Web Service integrates multiple applications for data communication."},
+ {q:"Match: 'A collection of software elements that act as interfaces between the database and the software that relies on its data.'", o:["The accessor","REST","SOAP","UDDI"], a:0, e:"The accessor sits between the database and the software relying on its data."},
+ {q:"Match: 'A client/server mechanism that allows the program to be distributed across multiple platforms.'", o:["RPC","REST","XML","SOA"], a:0, e:"RPC distributes programs across platforms via client/server calls."},
+ {q:"Match: 'Used to specify the message content, Internet protocols used, and the address a client must use to communicate with a particular Web service.'", o:["WSDL","UDDI","SMTP","XPath"], a:0, e:"WSDL specifies content, protocols, and the service address."},
+ {q:"Match: 'A protocol specification for exchanging structured information in the implementation of web services.'", o:["SOAP","REST","HTTP","FTP"], a:0, e:"SOAP is the protocol specification for exchanging structured information in web services."},
+ {q:"What is the best protocol that can be used to communicate between layers in a layered application?", o:["HTTP","FTP","SMTP","Telnet"], a:0, e:"HTTP is the commonly used protocol (with REST/SOAP/MQTT on top) for inter-layer communication."},
+ {q:"What characteristics should the interlayer communication protocol have?", o:["Flexible, scalable, reliable, secure, supports integration","Slow and proprietary","Stateful only","Closed and undocumented"], a:0, e:"It should be flexible, scalable, reliable, secure, and support integration."},
+ {q:"Patterns for ________ include Channel Adapter, Messaging Bus, and Messaging Bridge.", o:["Communication","Exception Management","Messaging channels","Validation"], a:2, e:"Channel Adapter, Messaging Bus, Messaging Bridge are messaging channel patterns."},
+ {q:"'Ensure that you log exceptions and do not reveal sensitive information in exception messages or log files' belongs to:", o:["Communication","Exception Management","Message protection","Caching"], a:1, e:"That guideline is part of Exception Management."},
+ {q:"List four basic types of middleware:", o:["TPM, RPC, MOM, Object Request Broker (CORBA)","HTTP, FTP, SMTP, DNS","HTML, CSS, JS, XML","SQL, NoSQL, Graph, Cache"], a:0, e:"Transaction Processing Monitors, Remote Procedure Call, Message-Oriented Middleware, and common object request broker architecture (CORBA)."},
+ {q:"Main functions of Transaction Processing Monitors (TPM):", o:["Control transaction applications and provide business logic/rules and database updates","Render web pages","Compile source code","Encrypt passwords"], a:0, e:"TPMs control transaction apps, provide business logic/rules, and handle database updates."},
+ {q:"RPCs are usually implemented by:", o:["Proprietary products","Open standards only","HTML","Spreadsheets"], a:0, e:"RPCs are usually implemented by proprietary products."},
+ {q:"What are the four web services standards?", o:["XML, WSDL, SOAP, UDDI","HTTP, FTP, TCP, IP","SQL, DDL, DML, DCL","MVC, MVP, MVVM, VIPER"], a:0, e:"The web services standards: XML, WSDL, SOAP, UDDI (plus REST as a style)."},
+ {q:"A SOAP message contains:", o:["Envelope, Header, Body (and optional Fault element)","Subject and attachments","Tables and rows","Cookies and sessions"], a:0, e:"Envelope defines structure, header adds info, body holds data, fault carries error details."},
+ {q:"Key components of SOA are:", o:["Services and service contracts","Tables and views","Pages and styles","Threads and locks"], a:0, e:"The service (self-contained, reusable, independent) and service contracts are SOA's key components."},
+ {q:"Which of the following is a benefit of SOA?", o:["Reusability","Scalability","Interoperability","All of the above"], a:3, e:"SOA benefits: reusability, modularity, scalability, interoperability, flexibility, agility, cost-effectiveness."},
+ {q:"Characteristics of SOA include:", o:["Loose coupling, reusability, interoperability, composability, scalability, governance","Tight coupling and single platform","Monolithic deployment","No standards"], a:0, e:"SOA is characterized by service-based architecture, loose coupling, reusability, interoperability, composability, scalability, and governance."},
+ {q:"HTTP characteristics include:", o:["Stateless, request-response model, URIs for resources, methods, headers, status codes, extensible","Stateful and connection-permanent","Binary-only protocol","No status codes"], a:0, e:"HTTP is stateless, request-response, uses URIs, methods, headers, and status codes, and is extensible."},
+ {q:"We can identify architectural style as:", o:["A description of component types","A set of constraints on architecture","A pattern of run-time control","All mentioned"], a:3, e:"Architectural style = component types + constraints + run-time control patterns — all mentioned."},
+ {q:"Layered architecture style is best suited to develop software applications which require:", o:["Components to be easily replaceable","Performance as a dominant factor","High security of data contents","Information separating as a dominant factor"], a:0, e:"Layered style suits apps requiring easily replaceable components (and incremental development)."},
+ {q:"Which of the following is TRUE about N-tier?", o:["Self-contained","Does not cost products","Simple and fewer faults","Uses common protocols"], a:3, e:"N-tier supports multiple applications via common protocols/APIs; it's actually more complex with more faults."},
+ {q:"What is the distributed system model which shows how data and processing are distributed across a range of components?", o:["Model-View-Controller (MVC)","Client-Server Architecture","Layered architecture","Repository architecture"], a:1, e:"Client-Server architecture distributes data and processing across components (servers, clients, network)."},
+ {q:"________ of a system is the structure or structures comprising software elements, their externally visible properties, and the relationships among them.", o:["Architectural design","Software design","Architectural patterns","Software architecture"], a:3, e:"That's the definition of software architecture."},
+ {q:"What is SOA?", o:["An architectural approach organizing software as independent, reusable services accessible over a network","A database engine","A programming language","A UI framework"], a:0, e:"SOA organizes software systems as independent services that communicate with each other over a network."}
 ]}
 ];
 
@@ -276,8 +348,11 @@ let cur=null, qi=0, score=0, order=[];
 const menu=document.getElementById('menu');
 CHAPTERS.forEach((c,i)=>{
   const d=document.createElement('div'); d.className='chap'; d.style.setProperty('--i',i);
-  d.innerHTML=`<h3>${c.name}</h3><span>${c.qs.length} questions</span>`;
-  d.onclick=()=>start(i); menu.appendChild(d);
+  d.setAttribute('role','button'); d.tabIndex=0;
+  d.innerHTML=`<h3>${c.name}</h3><span class="chip"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>${c.qs.length} questions</span>`;
+  d.onclick=()=>start(i);
+  d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();start(i);}};
+  menu.appendChild(d);
 });
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -315,8 +390,10 @@ function answer(idx,q,box){
     else b.classList.add('dim');
   });
   const fb=document.getElementById('fb');
-  if(idx===q.a){score++; fb.innerHTML=`<div class="feedback ok"><b>Correct</b>${q.e}</div>`;}
-  else fb.innerHTML=`<div class="feedback no"><b>Not quite</b>${q.e}</div>`;
+  const okIcon='<svg class="icon" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>';
+  const noIcon='<svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+  if(idx===q.a){score++; fb.innerHTML=`<div class="feedback ok"><b>${okIcon}Correct</b>${q.e}</div>`;}
+  else fb.innerHTML=`<div class="feedback no"><b>${noIcon}Not quite</b>${q.e}</div>`;
   document.getElementById('scoreLive').textContent=`Score: ${score}`;
   document.getElementById('nextBtn').classList.remove('hidden');
 }
