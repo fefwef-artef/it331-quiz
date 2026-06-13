@@ -29,15 +29,34 @@
   body{font-family:'Sofia Sans',Arial,sans-serif; background:var(--canvas); color:var(--ink);
     min-height:100vh; font-size:16px; font-weight:450; line-height:1.4; transition:background .3s, color .3s;}
 
-  .wrap{max-width:1000px; margin:0 auto; padding:64px 32px 128px;}
-  header{margin-bottom:96px; animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both; position:relative;}
+  .wrap{max-width:1000px; margin:0 auto; padding:140px 32px 128px;}
+  header{margin-bottom:96px; animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both;}
   .eyebrow{font-size:14px; font-weight:700; letter-spacing:.56px; text-transform:uppercase; color:var(--muted); margin-bottom:24px; display:flex; align-items:center; gap:8px;}
   .eyebrow::before{content:''; width:8px; height:8px; border-radius:50%; background:var(--arc); flex:none;}
   header h1{font-weight:500; font-size:clamp(40px,7vw,64px); line-height:1; letter-spacing:-.02em; color:var(--ink); max-width:700px;}
-  .theme-toggle{position:absolute; top:0; right:0; width:48px; height:48px; border-radius:50%;
+
+  /* floating pill navigation */
+  .nav{position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:50;
+    display:flex; align-items:center; gap:32px; background:var(--lifted); border-radius:999px;
+    padding:10px 12px 10px 28px; box-shadow:rgba(0,0,0,.04) 0 4px 24px; border:1px solid var(--hairline);
+    animation:navDrop .6s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes navDrop{from{opacity:0; transform:translate(-50%,-12px);}to{opacity:1; transform:translate(-50%,0);}}
+  .nav .wordmark{font-weight:700; font-size:16px; letter-spacing:-.32px; color:var(--ink); white-space:nowrap;}
+  .nav .navlink{font-weight:500; font-size:16px; letter-spacing:-.48px; color:var(--ink); background:none; border:none; white-space:nowrap; padding:8px 0;}
+  .nav .navlink:hover{color:var(--muted);}
+  .theme-toggle{width:48px; height:48px; border-radius:50%; flex:none;
     background:transparent; border:1px solid var(--hairline); color:var(--ink); display:flex; align-items:center; justify-content:center;
     transition:border-color .2s, background .2s;}
-  .theme-toggle:hover{border-color:var(--ink); background:var(--lifted);}
+  .theme-toggle:hover{border-color:var(--ink); background:var(--canvas);}
+
+  /* ghost watermark + orbital arcs behind the chapter constellation */
+  .menu-stage{position:relative;}
+  .ghost{position:absolute; top:-72px; left:-40px; font-weight:500; font-size:clamp(80px,14vw,160px);
+    letter-spacing:-.02em; line-height:1; color:var(--whisper); user-select:none; pointer-events:none; z-index:0; white-space:nowrap;}
+  .arcs{position:absolute; inset:-60px -80px; width:calc(100% + 160px); height:calc(100% + 120px);
+    pointer-events:none; z-index:0; overflow:visible;}
+  .arcs path{fill:none; stroke:var(--arc); stroke-width:1.5; opacity:.55;}
+  .grid{position:relative; z-index:1;}
 
   @keyframes fadeUp{from{opacity:0; transform:translateY(14px);}to{opacity:1; transform:translateY(0);}}
 
@@ -54,12 +73,12 @@
     background:var(--btn-bg); color:var(--btn-text); display:flex; align-items:center; justify-content:center;
     font-size:18px; transition:transform .25s cubic-bezier(.22,1,.36,1);}
   .chap:hover::after{transform:translateX(4px);}
-  /* signature tile — past exams */
-  .chap.spotlight{background:var(--signal);}
-  .chap.spotlight:hover{background:#e04e00;}
-  .chap.spotlight h3{color:#fff;}
-  .chap.spotlight span,.chap.spotlight .chip{color:rgba(255,255,255,.8);}
-  .chap.spotlight::after{background:#fff; color:#141413;}
+  /* signature tile — past exams (inverted ink/cream, per spec orange stays consent-only) */
+  .chap.spotlight{background:var(--btn-bg);}
+  .chap.spotlight:hover{background:var(--btn-bg); opacity:.92;}
+  .chap.spotlight h3{color:var(--btn-text);}
+  .chap.spotlight span,.chap.spotlight .chip{color:var(--btn-text); opacity:.7;}
+  .chap.spotlight::after{background:var(--canvas); color:var(--ink);}
 
   .hidden{display:none;}
   .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; color:var(--muted); font-size:14px; font-weight:700; letter-spacing:.56px; text-transform:uppercase;}
@@ -112,20 +131,33 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
   }
-  @media (max-width:480px){ .qcard{padding:32px 24px; border-radius:30px;} .wrap{padding:40px 20px 64px;} header{margin-bottom:56px;} .chap{padding:32px 24px; border-radius:30px;} .result{padding:64px 24px;} }
+  @media (max-width:767px){ .arcs{display:none;} .nav .navlink{display:none;} .nav{gap:16px; padding:8px 10px 8px 22px;} .ghost{font-size:64px; top:-44px; left:-10px;} }
+  @media (max-width:480px){ .qcard{padding:32px 24px; border-radius:30px;} .wrap{padding:110px 20px 64px;} header{margin-bottom:56px;} .chap{padding:32px 24px; border-radius:30px;} .result{padding:64px 24px;} }
 </style>
 </head>
 <body>
+<nav class="nav">
+  <span class="wordmark">IT1331</span>
+  <button class="navlink" onclick="goMenu()">Chapters</button>
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle light and dark mode">
+    <svg class="icon" style="margin:0" viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+  </button>
+</nav>
 <div class="wrap">
   <header>
-    <button class="theme-toggle" id="themeBtn" aria-label="Toggle light and dark mode">
-      <svg class="icon" style="margin:0" viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-    </button>
     <div class="eyebrow">IT1331 / N-Tier Architectures</div>
     <h1>Exam Practice</h1>
   </header>
 
-  <div id="menu" class="grid"></div>
+  <div id="menuWrap" class="menu-stage">
+    <div class="ghost" aria-hidden="true">Chapters</div>
+    <svg class="arcs" aria-hidden="true" viewBox="0 0 1100 900" preserveAspectRatio="none">
+      <path d="M -40 130 C 220 40, 520 210, 780 110 S 1140 190, 1180 90"/>
+      <path d="M -60 480 C 240 380, 460 590, 760 470 S 1080 540, 1170 430"/>
+      <path d="M 60 860 C 320 740, 620 900, 900 770"/>
+    </svg>
+    <div id="menu" class="grid"></div>
+  </div>
 
   <div id="quiz" class="hidden">
     <div class="topbar">
@@ -422,7 +454,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function start(i){
   cur=CHAPTERS[i]; qi=0; score=0;
   order=shuffle([...Array(cur.qs.length).keys()]);
-  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('menuWrap').classList.add('hidden');
   document.getElementById('done').classList.add('hidden');
   document.getElementById('quiz').classList.remove('hidden');
   show();
@@ -479,7 +511,7 @@ function retry(){ start(CHAPTERS.indexOf(cur)); }
 function goMenu(){
   document.getElementById('quiz').classList.add('hidden');
   document.getElementById('done').classList.add('hidden');
-  document.getElementById('menu').classList.remove('hidden');
+  document.getElementById('menuWrap').classList.remove('hidden');
 }
 
 // theme toggle — dark is default
