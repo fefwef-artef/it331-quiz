@@ -41,7 +41,20 @@
 
   @keyframes fadeUp{from{opacity:0; transform:translateY(14px);}to{opacity:1; transform:translateY(0);}}
 
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px;}
+  /* orbital arcs behind the chapter constellation */
+  .menu-stage{position:relative;}
+  .arcs{position:absolute; inset:-60px -80px; width:calc(100% + 160px); height:calc(100% + 120px);
+    pointer-events:none; z-index:0; overflow:visible;}
+  .arcs path{fill:none; stroke:var(--arc); stroke-width:1.5; opacity:.5;
+    stroke-dasharray:1600; stroke-dashoffset:0;
+    transition:stroke-dashoffset .2s, opacity .4s;}
+  /* draw the lines when hovering the chapter area */
+  .menu-stage:hover .arcs path{opacity:.95; animation:trace 1.6s cubic-bezier(.22,1,.36,1) forwards;}
+  .menu-stage:hover .arcs path:nth-child(2){animation-delay:.12s;}
+  .menu-stage:hover .arcs path:nth-child(3){animation-delay:.24s;}
+  @keyframes trace{from{stroke-dashoffset:1600;}to{stroke-dashoffset:0;}}
+
+  .grid{position:relative; z-index:1; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px;}
   .chap{background:var(--lifted); border-radius:40px; padding:40px 32px; cursor:pointer; position:relative;
     transition:background .25s, transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s;
     animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both; animation-delay:calc(var(--i)*40ms);}
@@ -112,6 +125,7 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
   }
+  @media (max-width:767px){ .arcs{display:none;} }
   @media (max-width:480px){ .qcard{padding:32px 24px; border-radius:30px;} .wrap{padding:40px 20px 64px;} header{margin-bottom:56px;} .chap{padding:32px 24px; border-radius:30px;} .result{padding:64px 24px;} }
 </style>
 </head>
@@ -125,7 +139,14 @@
     <h1>Exam Practice</h1>
   </header>
 
-  <div id="menu" class="grid"></div>
+  <div id="menuWrap" class="menu-stage">
+    <svg class="arcs" aria-hidden="true" viewBox="0 0 1100 900" preserveAspectRatio="none">
+      <path d="M -40 130 C 220 40, 520 210, 780 110 S 1140 190, 1180 90"/>
+      <path d="M -60 480 C 240 380, 460 590, 760 470 S 1080 540, 1170 430"/>
+      <path d="M 60 860 C 320 740, 620 900, 900 770"/>
+    </svg>
+    <div id="menu" class="grid"></div>
+  </div>
 
   <div id="quiz" class="hidden">
     <div class="topbar">
@@ -166,7 +187,7 @@ const CHAPTERS = [
  {q:"Which step comes FIRST in the typical system integration process?", o:["Deployment & Monitoring","Testing & Validation","Requirements Analysis","Interface Definition"], a:2, e:"The order is: Requirements Analysis → System Design → Interface Definition → Integration & Communication → Testing & Validation → Deployment & Monitoring."},
  {q:"True or False: 'Integration is not accidental; it requires architectural decisions.'", o:["True","False"], a:0, e:"This is the key takeaway — integration requires deliberate architectural decisions."}
 ]},
-{name:"Ch2: Architectural Design & Patterns (IT331-1)", qs:[
+{name:"Ch2: Architectural Design & Patterns", qs:[
  {q:"According to IEEE 1471-2000, architecture is:", o:["The source code of a system","The fundamental organization of a system embodied in its components, their relationships, and design principles","Only the database schema","The user interface design"], a:1, e:"IEEE 1471-2000 defines architecture as the fundamental organization of a system embodied in its components, relationships, and guiding principles."},
  {q:"Architectural design is described as:", o:["A creative activity identifying software components and their relationships based on customers' requirements","An automated process done by compilers","Writing test cases","Database normalization"], a:0, e:"Architectural design is a creative activity to identify components and relationships from customer requirements — and it's the first stage of software design."},
  {q:"True or False: Architectural design is the first stage in the software design process.", o:["True","False"], a:0, e:"Correct — architectural design comes first."},
@@ -180,7 +201,7 @@ const CHAPTERS = [
  {q:"If performance is critical, the architecture should:", o:["Use many small distributed components","Localize critical operations and minimize communication using fewer large components on the same computer","Add more firewalls","Use fine-grained components everywhere"], a:1, e:"Performance: localize critical operations, minimize communication, use a small number of relatively large components on the same computer."},
  {q:"If security is critical, you should use:", o:["A layered architecture with critical assets protected in the inner layers","A flat architecture","Client-side validation only","Public APIs for everything"], a:0, e:"Security: layered architecture with critical assets in inner layers and high validation applied to those layers."}
 ]},
-{name:"Ch3: N-Tier Architecture (IT331-2)", qs:[
+{name:"Ch3: N-Tier Architecture", qs:[
  {q:"'Layers' vs 'Tiers' — the difference is:", o:["Layers are physical, tiers are logical","Layers are logical separation, tiers are physical separation","They are exactly the same","Tiers only exist in databases"], a:1, e:"Layers = logical separation; Tiers = physical separation."},
  {q:"The main benefits of N-tier/3-tier are:", o:["Maintainability, Scalability, Flexibility, Availability","Speed, Cost, Color, Size","Encryption, Hashing, Signing","Only performance"], a:0, e:"The four main benefits: Maintainability, Scalability, Flexibility, and Availability."},
  {q:"True or False: Communication between tiers is typically asynchronous to support better scalability.", o:["True","False"], a:0, e:"Asynchronous communication between tiers supports better scalability."},
@@ -193,7 +214,7 @@ const CHAPTERS = [
  {q:"Which is a challenge of N-tier architectures?", o:["Load balancing is quite difficult","No new technologies to learn","Designing reusable objects is trivial","No middleware needed"], a:0, e:"Challenges include third-party middleware, heterogeneity, many new technologies, hard-to-design reusable objects, slow protocols, and difficult load balancing."},
  {q:"Thin clients are generally:", o:["Web browsers","C++ desktop apps","Java applications with MFC","Hardware terminals only"], a:0, e:"Thin clients are generally web browsers; the important choice is made in the middle tier."}
 ]},
-{name:"Ch4: Creating N-Tier Services (IT331-3)", qs:[
+{name:"Ch4: Creating N-Tier Services", qs:[
  {q:"A 'service' in N-Tier terminology is:", o:["A physical server","A component (class or set of classes) that performs a piece of functionality for an application","A network cable","An operating system process only"], a:1, e:"A service is a component that performs a piece of functionality; it can reside on one machine or be spread across machines."},
  {q:"Which service handles authenticating and authorizing users?", o:["User Tracking","Security Management","Log Management","Configuration Management"], a:1, e:"Security Management handles authentication and authorization, allowing certain users in and hiding menu items/fields."},
  {q:"The Data Access Service model says: if you have 10 tables, you create:", o:["1 class for everything","10 classes — one class per table","100 classes","No classes"], a:1, e:"One class per database object (table, stored procedure, view) — each handles add/edit/delete/retrieve for that object."},
@@ -207,7 +228,7 @@ const CHAPTERS = [
  {q:"The main disadvantage of the Business Rules Server is summarized in one word:", o:["Simplicity","Overhead","Security","Cheapness"], a:1, e:"'In a word: overhead!' — more tiers means more overhead getting to the data."},
  {q:"A benefit of Data Classes is:", o:["The form designer must understand data access internals","Division of labor — one programmer does data/business classes, another does forms","Code duplication increases","They work in only one language"], a:1, e:"Benefits: division of labor, centralized access (no duplicate code), reusable DLLs usable from any language/product."}
 ]},
-{name:"Ch5: Presentation Layer (IT331-4)", qs:[
+{name:"Ch5: Presentation Layer", qs:[
  {q:"The presentation layer contains components that:", o:["Manage the database","Implement and display the user interface and manage user interaction","Define business rules","Handle network routing"], a:1, e:"The presentation layer implements/displays the UI and manages user interaction."},
  {q:"The two typical component types in the presentation layer are:", o:["UI components and Presentation Logic components","Database and Network components","Business entities and workflows","Service agents and data helpers"], a:0, e:"UI components (visual elements) and Presentation Logic components (Presenter, Presentation Model, ViewModel)."},
  {q:"Caching improves:", o:["Application performance and UI responsiveness","Database size","Code readability","Security only"], a:0, e:"Caching improves performance and responsiveness by avoiding network round trips and duplicate processing."},
@@ -221,7 +242,7 @@ const CHAPTERS = [
  {q:"To improve testability and separate UI from business logic in web apps, consider:", o:["ASP.NET MVC Framework","More view state","Inline SQL in pages","Hard-coded strings"], a:0, e:"ASP.NET MVC supports a model-view-controller approach improving testability and separation."},
  {q:"True or False: In ASP.NET, view state should be used freely since it has no performance cost.", o:["True","False"], a:1, e:"Use view state cautiously — it increases data per round trip and can reduce performance."}
 ]},
-{name:"Ch6: Business Layer (IT331-5)", qs:[
+{name:"Ch6: Business Layer", qs:[
  {q:"The goal of a software architect when designing a business layer is to:", o:["Maximize code volume","Minimize complexity by separating tasks into different areas of concern","Merge all logic into one class","Avoid documentation"], a:1, e:"Minimize complexity via separation of concerns (business processing, workflow, entities)."},
  {q:"An Application Façade:", o:["Combines multiple business operations into a single message-based operation","Is a required component in every app","Stores data permanently","Renders the UI"], a:0, e:"The (optional) application façade combines multiple business operations into one message-based operation."},
  {q:"Business entity components are used to:", o:["Pass data between components, representing real-world entities like products and orders","Encrypt passwords","Draw the user interface","Route network traffic"], a:0, e:"Business entities pass data between components (DataSets, XML, or custom OO classes)."},
@@ -234,7 +255,7 @@ const CHAPTERS = [
  {q:"Using exceptions to control application logic flow is:", o:["A best practice","A common mistake to avoid","Required by .NET","The fastest approach"], a:1, e:"Do not use exceptions for application logic; that's listed as an exception-management mistake."},
  {q:"Relying only on validation that occurs in the presentation layer is:", o:["Safe and sufficient","A validation mistake — the business layer must validate too","Required by standards","Faster and recommended"], a:1, e:"Relying on presentation-layer validation is a common mistake; validate range, type, and format in the business layer and reuse validation logic."}
 ]},
-{name:"Ch7: Data Layer (IT331-6)", qs:[
+{name:"Ch7: Data Layer", qs:[
  {q:"Typical components of the data layer are:", o:["Data Access components and Service Agents","UI components and ViewModels","Workflows and Facades","Controllers and Views"], a:0, e:"Data layer = Data Access components (abstract data store logic) + Service Agents (handle external service calls)."},
  {q:"Service agents:", o:["Isolate the requirements for calling external services, and may add caching, offline support, and data mapping","Draw charts","Replace databases","Are part of the presentation layer"], a:0, e:"Service agents manage communication semantics with external services plus caching/offline/mapping."},
  {q:"Connections guideline: you should open connections:", o:["As early as possible and keep them open","As late as possible and close them as early as possible","Once a day","Only on Mondays"], a:1, e:"Open late, close early; never hold connections open for excessive periods."},
@@ -248,7 +269,7 @@ const CHAPTERS = [
  {q:"When storing passwords you should use:", o:["Plain text","A salted hash instead of an encrypted version","Base64 encoding","The username as password"], a:1, e:"Use a salted hash — not encryption, not plain text."},
  {q:"True or False: It's recommended to locate the data access layer on the same server as the database.", o:["True","False"], a:1, e:"Consider a DIFFERENT server: DB servers are optimized for their role; combining both on one tier likely reduces performance."}
 ]},
-{name:"Ch8: Service Layer (IT331-7)", qs:[
+{name:"Ch8: Service Layer", qs:[
  {q:"A key concept of the service layer is that a service should:", o:["Expose all internal business entities","Never expose internal entities used by the business layer","Always use the database directly","Skip validation"], a:1, e:"A service should never expose internal processes or business entities; use translator components and data contracts."},
  {q:"The two typical components of the service layer are:", o:["Service interfaces and Message types","Controllers and Views","Tables and Indexes","Threads and Processes"], a:0, e:"Service interfaces (façade exposing business logic) and Message types (wrapping data structures)."},
  {q:"Idempotency means:", o:["Messages must arrive in order","You could receive duplicate messages but should handle only one","All messages are encrypted","Services run once a day"], a:1, e:"Idempotency: detect and manage repeated messages, handling only one."},
@@ -422,7 +443,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function start(i){
   cur=CHAPTERS[i]; qi=0; score=0;
   order=shuffle([...Array(cur.qs.length).keys()]);
-  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('menuWrap').classList.add('hidden');
   document.getElementById('done').classList.add('hidden');
   document.getElementById('quiz').classList.remove('hidden');
   show();
@@ -479,7 +500,7 @@ function retry(){ start(CHAPTERS.indexOf(cur)); }
 function goMenu(){
   document.getElementById('quiz').classList.add('hidden');
   document.getElementById('done').classList.add('hidden');
-  document.getElementById('menu').classList.remove('hidden');
+  document.getElementById('menuWrap').classList.remove('hidden');
 }
 
 // theme toggle — dark is default
