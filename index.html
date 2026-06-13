@@ -442,8 +442,11 @@ const ORDER=[
   "Past Exams Questions"
 ];
 CHAPTERS.sort((a,b)=>ORDER.indexOf(a.name)-ORDER.indexOf(b.name));
-// renumber the ChN: prefix to match the new order
-CHAPTERS.forEach((c,i)=>{ c.name=c.name.replace(/^Ch\d+:\s*/, 'Ch'+(i+1)+': '); });
+// number only the 7 IT331 lecture chapters; keep the standalone chapters' original names
+CHAPTERS.forEach((c,i)=>{
+  if(i<7) c.name=c.name.replace(/^Ch\d+:\s*/, 'Ch'+(i+1)+': ');
+  else c.name=c.name.replace(/^Ch\d+:\s*/, '');
+});
 
 let cur=null, qi=0, score=0, order=[];
 
