@@ -41,18 +41,22 @@
 
   @keyframes fadeUp{from{opacity:0; transform:translateY(14px);}to{opacity:1; transform:translateY(0);}}
 
-  /* orbital arcs behind the chapter constellation */
+  /* orbital circles behind the chapter constellation */
   .menu-stage{position:relative;}
-  .arcs{position:absolute; inset:-60px -80px; width:calc(100% + 160px); height:calc(100% + 120px);
+  .arcs{position:absolute; inset:-80px -100px; width:calc(100% + 200px); height:calc(100% + 160px);
     pointer-events:none; z-index:0; overflow:visible;}
-  .arcs path{fill:none; stroke:var(--arc); stroke-width:1.5; opacity:.5;
-    stroke-dasharray:1600; stroke-dashoffset:0;
-    transition:stroke-dashoffset .2s, opacity .4s;}
-  /* draw the lines when hovering the chapter area */
-  .menu-stage:hover .arcs path{opacity:.95; animation:trace 1.6s cubic-bezier(.22,1,.36,1) forwards;}
-  .menu-stage:hover .arcs path:nth-child(2){animation-delay:.12s;}
-  .menu-stage:hover .arcs path:nth-child(3){animation-delay:.24s;}
-  @keyframes trace{from{stroke-dashoffset:1600;}to{stroke-dashoffset:0;}}
+  .arcs .ring{fill:none; stroke:var(--arc); stroke-width:1.2; opacity:.14; transition:opacity .5s;}
+  .arcs .comet{fill:none; stroke:var(--arc); stroke-width:2; stroke-linecap:round; opacity:.7;
+    stroke-dasharray:14 86; stroke-dashoffset:0; transition:opacity .5s;
+    animation:orbit 8s linear infinite;}
+  .arcs .o2 .comet{animation-duration:11s; animation-direction:reverse;}
+  .arcs .o3 .comet{animation-duration:14s;}
+  @keyframes orbit{to{stroke-dashoffset:-100;}}
+  /* hover: rings glow, satellites speed up */
+  .menu-stage:hover .arcs .ring{opacity:.32;}
+  .menu-stage:hover .arcs .comet{opacity:1; animation-duration:3s;}
+  .menu-stage:hover .arcs .o2 .comet{animation-duration:3.6s;}
+  .menu-stage:hover .arcs .o3 .comet{animation-duration:4.2s;}
 
   .grid{position:relative; z-index:1; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px;}
   .chap{background:var(--lifted); border-radius:40px; padding:40px 32px; cursor:pointer; position:relative;
@@ -124,6 +128,7 @@
   .chip{display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:14px; font-weight:450;}
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+    .arcs .comet{stroke-dasharray:none; opacity:.3;}
   }
   @media (max-width:767px){ .arcs{display:none;} }
   @media (max-width:480px){ .qcard{padding:32px 24px; border-radius:30px;} .wrap{padding:40px 20px 64px;} header{margin-bottom:56px;} .chap{padding:32px 24px; border-radius:30px;} .result{padding:64px 24px;} }
@@ -140,10 +145,10 @@
   </header>
 
   <div id="menuWrap" class="menu-stage">
-    <svg class="arcs" aria-hidden="true" viewBox="0 0 1100 900" preserveAspectRatio="none">
-      <path d="M -40 130 C 220 40, 520 210, 780 110 S 1140 190, 1180 90"/>
-      <path d="M -60 480 C 240 380, 460 590, 760 470 S 1080 540, 1170 430"/>
-      <path d="M 60 860 C 320 740, 620 900, 900 770"/>
+    <svg class="arcs" aria-hidden="true" viewBox="0 0 1100 900" preserveAspectRatio="xMidYMid slice">
+      <g class="o1"><circle class="ring" cx="180" cy="170" r="150"/><circle class="comet" cx="180" cy="170" r="150" pathLength="100"/></g>
+      <g class="o2"><circle class="ring" cx="900" cy="320" r="120"/><circle class="comet" cx="900" cy="320" r="120" pathLength="100"/></g>
+      <g class="o3"><circle class="ring" cx="540" cy="720" r="200"/><circle class="comet" cx="540" cy="720" r="200" pathLength="100"/></g>
     </svg>
     <div id="menu" class="grid"></div>
   </div>
